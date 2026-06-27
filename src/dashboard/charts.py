@@ -205,23 +205,24 @@ def build_traverse_animation(
             name=str(i),
             data=[
                 go.Heatmap(z=hillshade, colorscale="Greys", zmin=zmin, zmax=zmax, showscale=False, hoverinfo="skip"),
-                go.Scatter(x=cols, y=rows, mode="lines", line=dict(color="rgba(255,107,53,0.4)", width=2)),
+                go.Scatter(x=cols, y=rows, mode="lines", line=dict(color="rgba(77,166,255,0.35)", width=2)),
                 go.Scatter(x=[cols[0]], y=[rows[0]], mode="markers+text",
-                           marker=dict(size=14, color="#2ecc71", symbol="triangle-up"), text=["START"]),
+                           marker=dict(size=14, color="#4da6ff", symbol="triangle-up"), text=["START"]),
                 go.Scatter(x=[cols[-1]], y=[rows[-1]], mode="markers+text",
                            marker=dict(size=14, color="#f5c842", symbol="star"), text=["GOAL"]),
                 go.Scatter(x=trail_x, y=trail_y, mode="markers+lines",
-                           marker=dict(size=16, color="#ff6b35"), line=dict(color="#ff6b35", width=3)),
+                           marker=dict(size=16, color="#4da6ff"), line=dict(color="#4da6ff", width=3)),
             ],
         ))
 
     map_fig.frames = frames
     map_fig.update_layout(
         **PLOTLY_DARK_LAYOUT,
-        title="Rover Traverse Animation",
-        height=420,
-        xaxis=dict(range=[0, size], constrain="domain"),
-        yaxis=dict(range=[size, 0], scaleanchor="x", scaleratio=1),
+        title=dict(text="Rover Traverse", font=dict(family="Orbitron, sans-serif", size=14, color="#ffffff"), x=0.02),
+        height=440,
+        xaxis=dict(range=[0, size], constrain="domain", showticklabels=False),
+        yaxis=dict(range=[size, 0], scaleanchor="x", scaleratio=1, showticklabels=False),
+        legend=PLOTLY_LEGEND_BOTTOM,
         updatemenus=[{
             "type": "buttons",
             "showactive": False,
