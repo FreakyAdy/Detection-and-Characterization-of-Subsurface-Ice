@@ -13,12 +13,17 @@ from src.dashboard.colormaps import (
     DOP_CMAP,
     ICE_CMAP,
     PLOTLY_DARK_LAYOUT,
+    PLOTLY_LEGEND_BOTTOM,
     SLOPE_CMAP,
 )
 
 
 def _apply_dark(fig: go.Figure, title: str = "", height: int = 400) -> go.Figure:
-    fig.update_layout(**PLOTLY_DARK_LAYOUT, title=title, height=height)
+    fig.update_layout(
+        **PLOTLY_DARK_LAYOUT,
+        title=dict(text=title, font=dict(family="Orbitron, sans-serif", size=14, color="#ffffff"), x=0.02, xanchor="left"),
+        height=height,
+    )
     return fig
 
 
@@ -45,11 +50,11 @@ def build_cpr_dop_heatmaps(
     )
     fig.add_annotation(
         text=f"Ice if CPR > {cpr_threshold}", xref="paper", yref="paper",
-        x=0.22, y=1.08, showarrow=False, font=dict(color="#00d4ff", size=11),
+        x=0.22, y=1.02, showarrow=False, font=dict(color="#4da6ff", size=11),
     )
     fig.add_annotation(
         text=f"Ice if DOP < {dop_threshold}", xref="paper", yref="paper",
-        x=0.78, y=1.08, showarrow=False, font=dict(color="#f5c842", size=11),
+        x=0.78, y=1.02, showarrow=False, font=dict(color="#f5c842", size=11),
     )
     fig.update_xaxes(showticklabels=False)
     fig.update_yaxes(showticklabels=False, scaleanchor="x", scaleratio=1)
@@ -63,9 +68,9 @@ def build_cpr_dop_histograms(
     dop_threshold: float = 0.13,
 ) -> go.Figure:
     fig = make_subplots(rows=1, cols=2, subplot_titles=("CPR Distribution", "DOP Distribution"))
-    fig.add_trace(go.Histogram(x=cpr.ravel(), nbinsx=50, marker_color="#f5a623", name="CPR"), row=1, col=1)
-    fig.add_trace(go.Histogram(x=dop.ravel(), nbinsx=50, marker_color="#00d4ff", name="DOP"), row=1, col=2)
-    fig.add_vline(x=cpr_threshold, line_dash="dash", line_color="#00d4ff", row=1, col=1)
+    fig.add_trace(go.Histogram(x=cpr.ravel(), nbinsx=50, marker_color="#4da6ff", name="CPR"), row=1, col=1)
+    fig.add_trace(go.Histogram(x=dop.ravel(), nbinsx=50, marker_color="#7b68ee", name="DOP"), row=1, col=2)
+    fig.add_vline(x=cpr_threshold, line_dash="dash", line_color="#4da6ff", row=1, col=1)
     fig.add_vline(x=dop_threshold, line_dash="dash", line_color="#f5c842", row=1, col=2)
     return _apply_dark(fig, "Threshold Analysis", height=320)
 
@@ -76,7 +81,7 @@ def build_landing_bar_chart(sites: List[Dict[str, Any]]) -> go.Figure:
         return _apply_dark(fig, "Landing Sites", height=300)
     ranks = [f"#{s['rank']}" for s in sites]
     scores = [s["score"] for s in sites]
-    colors = ["#f5c842" if s["rank"] == 1 else "#00d4ff" for s in sites]
+    colors = ["#f5c842" if s["rank"] == 1 else "#4da6ff" for s in sites]
     fig = go.Figure(go.Bar(x=ranks, y=scores, marker_color=colors, text=[f"{s:.3f}" for s in scores], textposition="outside"))
     fig.update_layout(yaxis_title="Safety Score", xaxis_title="Rank")
     return _apply_dark(fig, "Ranked Landing Sites", height=320)
@@ -100,8 +105,8 @@ def build_landing_radar_chart(sites: List[Dict[str, Any]]) -> go.Figure:
         r=values + [values[0]],
         theta=categories + [categories[0]],
         fill="toself",
-        fillcolor="rgba(0,212,255,0.2)",
-        line=dict(color="#00d4ff", width=2),
+        fillcolor="rgba(77,166,255,0.2)",
+        line=dict(color="#4da6ff", width=2),
         name=f"Site #{top['rank']}",
     ))
     fig.update_layout(polar=dict(
@@ -122,16 +127,16 @@ def build_volume_ci_chart(summary: Dict[str, Any]) -> go.Figure:
         x=[lo, mean, hi],
         y=["Volume"] * 3,
         mode="markers+lines",
-        marker=dict(size=[12, 18, 12], color=["#7b68ee", "#00d4ff", "#7b68ee"]),
-        line=dict(color="rgba(0,212,255,0.5)", width=4),
+        marker=dict(size=[12, 18, 12], color=["#7b68ee", "#4da6ff", "#7b68ee"]),
+        line=dict(color="rgba(77,166,255,0.5)", width=4),
         name="95% CI",
     ))
-    fig.add_vrect(x0=lo, x1=hi, fillcolor="rgba(0,212,255,0.15)", line_width=0)
+    fig.add_vrect(x0=lo, x1=hi, fillcolor="rgba(77,166,255,0.15)", line_width=0)
     fig.add_annotation(
         x=mean, y=1.15, yref="paper",
         text=f"Mean: {mean:,.0f} m³<br>Water: {water:,.0f} kg",
         showarrow=False, font=dict(color="#e8edf5", size=12),
-        bgcolor="rgba(18,24,38,0.9)", bordercolor="#00d4ff",
+        bgcolor="rgba(10,22,40,0.9)", bordercolor="#4da6ff",
     )
     fig.update_layout(xaxis_title="Volume (m³)", showlegend=False)
     return _apply_dark(fig, "Monte Carlo Ice Volume (95% CI)", height=340)

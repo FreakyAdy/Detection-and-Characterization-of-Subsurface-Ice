@@ -132,11 +132,24 @@ def build_mission_map(
 
     fig.update_layout(
         **PLOTLY_DARK_LAYOUT,
-        title=f"Mission Map — CPR>{cpr_th}, DOP<{dop_th}",
-        height=520,
-        xaxis=dict(range=[0, size], showgrid=False, zeroline=False),
-        yaxis=dict(range=[size, 0], scaleanchor="x", scaleratio=1, showgrid=False, zeroline=False),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
+        title=dict(
+            text="Mission Map",
+            font=dict(family="Orbitron, sans-serif", size=16, color="#ffffff"),
+            x=0.02,
+            xanchor="left",
+        ),
+        annotations=[dict(
+            text=f"CPR &gt; {cpr_th} · DOP &lt; {dop_th}",
+            xref="paper", yref="paper",
+            x=0.02, y=1.0,
+            showarrow=False,
+            font=dict(size=11, color="#9aa8bc", family="Rajdhani, sans-serif"),
+            xanchor="left",
+        )],
+        height=560,
+        xaxis=dict(range=[0, size], showgrid=False, zeroline=False, showticklabels=False),
+        yaxis=dict(range=[size, 0], scaleanchor="x", scaleratio=1, showgrid=False, zeroline=False, showticklabels=False),
+        legend=PLOTLY_LEGEND_BOTTOM,
         dragmode="pan",
     )
     return fig
