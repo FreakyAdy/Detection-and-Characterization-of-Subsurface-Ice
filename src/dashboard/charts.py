@@ -245,12 +245,12 @@ def build_traverse_animation(
     elev_fig = go.Figure()
     elev_fig.add_trace(go.Scatter(
         x=distances, y=elevations, mode="lines",
-        fill="tozeroy", fillcolor="rgba(0,212,255,0.15)",
-        line=dict(color="#00d4ff", width=2), name="Elevation",
+        fill="tozeroy", fillcolor="rgba(77,166,255,0.12)",
+        line=dict(color="#4da6ff", width=2), name="Elevation",
     ))
     elev_fig.add_trace(go.Scatter(
         x=[distances[0]], y=[elevations[0]],
-        mode="markers", marker=dict(size=10, color="#ff6b35"), name="Rover",
+        mode="markers", marker=dict(size=10, color="#4da6ff"), name="Rover",
     ))
 
     elev_frames = []
@@ -259,9 +259,9 @@ def build_traverse_animation(
             name=str(i),
             data=[
                 go.Scatter(x=distances, y=elevations, mode="lines", fill="tozeroy",
-                           fillcolor="rgba(0,212,255,0.15)", line=dict(color="#00d4ff", width=2)),
+                           fillcolor="rgba(77,166,255,0.12)", line=dict(color="#4da6ff", width=2)),
                 go.Scatter(x=[distances[i]], y=[elevations[i]],
-                           mode="markers", marker=dict(size=12, color="#ff6b35")),
+                           mode="markers", marker=dict(size=12, color="#4da6ff")),
             ],
         ))
     elev_fig.frames = elev_frames
@@ -295,7 +295,7 @@ def build_3d_surface(dem: np.ndarray, path: Optional[List[List[int]]] = None) ->
         pz = [float(dem_ds[min(p[0], dem_ds.shape[0] - 1), min(p[1], dem_ds.shape[1] - 1)]) for p in path_ds]
         fig.add_trace(go.Scatter3d(
             x=px, y=py, z=pz, mode="lines+markers",
-            line=dict(color="#ff6b35", width=6),
+            line=dict(color="#4da6ff", width=6),
             marker=dict(size=3, color="#f5c842"),
             name="Traverse",
         ))
