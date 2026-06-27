@@ -19,7 +19,6 @@ from src.dashboard.theme import (
     inject_theme,
     render_hero,
     render_kpi_row,
-    render_nav,
     render_wave_divider,
     section_header,
 )
@@ -30,6 +29,25 @@ DEMO_STEPS = [
     ("3 · Traverse", "Optimized rover path avoids steep slopes and maximizes ice proximity."),
     ("4 · Volume", "Monte Carlo estimate quantifies subsurface ice volume with 95% confidence."),
 ]
+
+
+def _render_nav(mission_label: str) -> None:
+    """Render the top nav locally so stale Streamlit module caches cannot break import."""
+    st.markdown(
+        f"""
+        <div class="nav-bar">
+            <div class="nav-logo">LUNAR<span>ICE</span>PATH</div>
+            <div class="nav-links">
+                <span>Mission</span>
+                <span>Radar</span>
+                <span>Terrain</span>
+                <span>Traverse</span>
+            </div>
+            <div class="nav-badge">{mission_label}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def _init_session() -> None:
@@ -128,7 +146,7 @@ def main() -> None:
 
     ui = _render_sidebar(summary, data.has_rasters)
 
-    render_nav(mission_label)
+    _render_nav(mission_label)
     render_hero(mission_label, summary.get("mission_coords", "87.23°S, 83.54°E"))
 
     path_len = len(summary.get("traverse_path", []))
