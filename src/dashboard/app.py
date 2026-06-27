@@ -15,7 +15,14 @@ from src.dashboard.charts import (
 )
 from src.dashboard.data_loader import load_mission_data
 from src.dashboard.maps import build_mission_map, build_terrain_deck
-from src.dashboard.theme import inject_theme, render_hero, render_kpi_row
+from src.dashboard.theme import (
+    inject_theme,
+    render_hero,
+    render_kpi_row,
+    render_nav,
+    render_wave_divider,
+    section_header,
+)
 
 DEMO_STEPS = [
     ("1 · Detect", "DFSAR CPR/DOP analysis identifies subsurface ice signatures in the doubly shadowed crater."),
@@ -34,7 +41,11 @@ def _init_session() -> None:
 
 def _render_sidebar(summary: dict, has_rasters: bool) -> dict:
     with st.sidebar:
-        st.markdown("### Mission Control")
+        st.markdown(
+            '<p style="font-family:Orbitron,sans-serif;color:#4da6ff;'
+            'letter-spacing:0.12em;font-size:0.85rem;margin-bottom:0">MISSION CONTROL</p>',
+            unsafe_allow_html=True,
+        )
         st.caption(summary.get("mission_label", "Faustini DSC"))
         st.caption(summary.get("mission_coords", "87.23°S, 83.54°E"))
 
@@ -62,7 +73,11 @@ def _render_sidebar(summary: dict, has_rasters: bool) -> dict:
                     st.rerun()
 
         st.divider()
-        st.markdown("#### Map Layers")
+        st.markdown(
+            '<p style="font-family:Rajdhani,sans-serif;color:#4da6ff;'
+            'letter-spacing:0.14em;font-size:0.75rem;text-transform:uppercase">Map Layers</p>',
+            unsafe_allow_html=True,
+        )
         show_ice = st.checkbox("Ice probability", value=True)
         show_cpr = st.checkbox("CPR", value=False)
         show_dop = st.checkbox("DOP", value=False)
@@ -109,30 +124,33 @@ def main() -> None:
         st.stop()
 
     summary = data.summary
+    mission_label = summary.get("mission_label", "Faustini DSC")
+
     ui = _render_sidebar(summary, data.has_rasters)
 
-    render_hero(
-        summary.get("mission_label", "Faustini DSC"),
-        summary.get("mission_coords", "87.23°S, 83.54°E"),
-    )
+    render_nav(mission_label)
+    render_hero(mission_label, summary.get("mission_coords", "87.23°S, 83.54°E"))
 
     path_len = len(summary.get("traverse_path", []))
     render_kpi_row([
-        ("Ice Pixels", f"{summary.get('ice_pixel_count', 0):,}"),
-        ("Volume (m³)", f"{summary.get('volume_mean_m3', 0):,.0f}"),
-        ("Water (kg)", f"{summary.get('water_kg', 0):,.0f}"),
-        ("Traverse (m)", f"{summary.get('traverse_distance_m', path_len * summary.get('pixel_size_m', 10)):.0f}"),
+        ("❄", "Ice Pixels", f"{summary.get('ice_pixel_count', 0):,}", "DFSAR candidates"),
+        ("◈", "Volume", f"{summary.get('volume_mean_m3', 0):,.0f} m³", "Monte Carlo mean"),
+        ("◎", "Water Mass", f"{summary.get('water_kg', 0):,.0f} kg", "H₂O equivalent"),
+        ("➤", "Traverse", f"{summary.get('traverse_distance_m', path_len * summary.get('pixel_size_m', 10)):.0f} m", f"{path_len} waypoints"),
     ])
 
+    render_wave_divider()
+
     tab_mission, tab_science, tab_traverse, tab_volume, tab_3d = st.tabs([
-        "Mission Map",
-        "Ice Science",
-        "Rover Traverse",
-        "Volume Estimate",
-        "3D Terrain",
+        "◈ Mission Map",
+        "◎ Ice Science",
+        "➤ Rover Traverse",
+        "◆ Volume",
+        "▲ 3D Terrain",
     ])
 
     with tab_mission:
+        section_header("Our Mission", "Surface Map & Ice Overlay")
         if data.has_rasters:
             fig = build_mission_map(
                 data.hillshade,
@@ -147,11 +165,12 @@ def main() -> None:
                 show_slope=ui["show_slope"],
                 overlay_opacity=ui["overlay_opacity"],
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
         else:
             st.info("Raster arrays missing. Re-run `python scripts/run_demo_pipeline.py` for the full mission map.")
 
     with tab_science:
+        section_header("Radar Analysis", "DFSAR Polarimetric Products")
         if data.cpr is not None and data.dop is not None:
             c1, c2 = st.columns(2)
             with c1:
@@ -162,6 +181,7 @@ def main() -> None:
                         summary.get("dop_threshold", 0.13),
                     ),
                     use_container_width=True,
+                    config={"displayModeBar": False},
                 )
             with c2:
                 st.plotly_chart(
@@ -171,6 +191,7 @@ def main() -> None:
                         summary.get("dop_threshold", 0.13),
                     ),
                     use_container_width=True,
+                    config={"displayModeBar": False},
                 )
             m1, m2, m3, m4 = st.columns(4)
             m1.metric("Mean ice prob", f"{summary.get('mean_ice_prob', 0):.3f}")
@@ -180,23 +201,19 @@ def main() -> None:
         else:
             st.info("CPR/DOP arrays not found. Re-run the pipeline.")
 
-        if ui["demo_mode"] and ui["demo_step"] == 1:
+        show_landing = (ui["demo_mode"] and ui["demo_step"] == 1) or not ui["demo_mode"]
+        if show_landing:
+            render_wave_divider()
+            section_header("Landing Sites", "Ranked Safety Analysis")
             sites = summary.get("landing_sites", [])
             c1, c2 = st.columns(2)
             with c1:
-                st.plotly_chart(build_landing_bar_chart(sites), use_container_width=True)
+                st.plotly_chart(build_landing_bar_chart(sites), use_container_width=True, config={"displayModeBar": False})
             with c2:
-                st.plotly_chart(build_landing_radar_chart(sites), use_container_width=True)
-        elif not ui["demo_mode"]:
-            with st.expander("Landing site analysis"):
-                sites = summary.get("landing_sites", [])
-                c1, c2 = st.columns(2)
-                with c1:
-                    st.plotly_chart(build_landing_bar_chart(sites), use_container_width=True)
-                with c2:
-                    st.plotly_chart(build_landing_radar_chart(sites), use_container_width=True)
+                st.plotly_chart(build_landing_radar_chart(sites), use_container_width=True, config={"displayModeBar": False})
 
     with tab_traverse:
+        section_header("Rover Path", "Optimized Traverse")
         path = summary.get("traverse_path", [])
         t1, t2, t3 = st.columns(3)
         t1.metric("Waypoints", len(path))
@@ -208,16 +225,17 @@ def main() -> None:
                 path, data.dem, data.slope,
                 pixel_size_m=summary.get("pixel_size_m", 10.0),
             )
-            st.plotly_chart(map_anim, use_container_width=True)
-            st.plotly_chart(elev_anim, use_container_width=True)
+            st.plotly_chart(map_anim, use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(elev_anim, use_container_width=True, config={"displayModeBar": False})
         else:
             st.info("Traverse animation requires dem.npy and slope.npy from pipeline.")
 
         if ui["demo_mode"] and ui["demo_step"] == 2:
-            st.success("Rover traverse connects landing site to ice target — press **Play** on the animation above.")
+            st.success("Press **Play** on the animation to show the rover path to the ice target.")
 
     with tab_volume:
-        st.plotly_chart(build_volume_ci_chart(summary), use_container_width=True)
+        section_header("Resource Estimate", "Subsurface Ice Volume")
+        st.plotly_chart(build_volume_ci_chart(summary), use_container_width=True, config={"displayModeBar": False})
         v1, v2, v3, v4 = st.columns(4)
         v1.metric("Mean volume", f"{summary.get('volume_mean_m3', 0):,.0f} m³")
         v2.metric("CI lower", f"{summary.get('volume_ci_low', 0):,.0f} m³")
@@ -231,12 +249,14 @@ def main() -> None:
             )
 
     with tab_3d:
+        section_header("Terrain Model", "3D Crater Visualization")
         if data.dem is not None:
             c1, c2 = st.columns([1, 1])
             with c1:
                 st.plotly_chart(
                     build_3d_surface(data.dem, summary.get("traverse_path")),
                     use_container_width=True,
+                    config={"displayModeBar": False},
                 )
             with c2:
                 try:
@@ -256,8 +276,10 @@ def main() -> None:
         step = ui["demo_step"]
         titles = [s[0] for s in DEMO_STEPS]
         st.markdown(
-            f"**Judge demo:** Step {step + 1}/4 — {titles[step]}. "
-            "Use sidebar **Next →** to advance."
+            f'<div class="demo-step-active" style="margin-top:1rem">'
+            f'<strong>Judge Demo — Step {step + 1}/4:</strong> {titles[step]}. '
+            f'Use sidebar <strong>Next →</strong> to advance.</div>',
+            unsafe_allow_html=True,
         )
 
 

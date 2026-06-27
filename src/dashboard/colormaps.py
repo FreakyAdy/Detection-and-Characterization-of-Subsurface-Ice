@@ -5,11 +5,11 @@ from __future__ import annotations
 from typing import List, Tuple
 
 ICE_CMAP: List[Tuple[float, str]] = [
-    (0.0, "#0a0e17"),
-    (0.2, "#1a3a5c"),
-    (0.5, "#00a8cc"),
-    (0.8, "#00d4ff"),
-    (1.0, "#e0f7ff"),
+    (0.0, "#000000"),
+    (0.2, "#0a1628"),
+    (0.5, "#2d7dd2"),
+    (0.8, "#4da6ff"),
+    (1.0, "#cce8ff"),
 ]
 
 CPR_CMAP: List[Tuple[float, str]] = [
