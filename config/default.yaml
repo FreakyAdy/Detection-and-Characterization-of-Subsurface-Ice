@@ -1,0 +1,41 @@
+# LunarIcePath default configuration — BAH 2026 PS 8
+
+paths:
+  dfsar_co_pol: "data/dfsar/co_pol.tif"
+  dfsar_cross_pol: "data/dfsar/cross_pol.tif"
+  ohrc_dem: "data/ohrc/dem.tif"
+  output_dir: "output"
+
+ice_detection:
+  cpr_threshold: 1.0
+  dop_threshold: 0.13
+  fusion_weight_l_band: 0.5
+  morphology_boost: 0.15      # Add to probability if low roughness
+  morphology_penalty: 0.25      # Subtract if high roughness
+
+terrain:
+  max_landing_slope_deg: 8.0
+  max_traverse_slope_deg: 15.0
+  roughness_window: 5
+  landing_ellipse_radius_m: 500
+
+traverse:
+  algorithm: "astar"            # astar | dijkstra
+  weights:
+    distance: 1.0
+    slope: 2.0
+    roughness: 1.5
+    ice_proximity: -3.0         # Negative = reward (minimize cost)
+
+volume:
+  regolith_depth_m: 5.0
+  default_ice_fraction: 0.15
+  dielectric_regolith: 3.0
+  dielectric_ice: 3.15
+  monte_carlo_samples: 1000
+  ice_probability_threshold: 0.7
+
+demo:
+  grid_size: 128
+  pixel_size_m: 10.0
+  seed: 42
