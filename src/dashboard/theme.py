@@ -208,25 +208,31 @@ def inject_theme() -> None:
             opacity: 0.8;
         }}
 
-        /* ── Chart panel (glass + corner accent) ── */
-        .chart-panel {{
+        /* ── Plotly chart containers ── */
+        div[data-testid="stPlotlyChart"] {{
             background: {CARD};
             border: 1px solid {CARD_BORDER};
             border-radius: 14px;
-            padding: 0.5rem 0.75rem 0.25rem;
-            margin-bottom: 0.75rem;
+            padding: 0.35rem 0.5rem 0.5rem;
+            margin-bottom: 0.5rem;
             position: relative;
         }}
-        .chart-panel::after {{
+        div[data-testid="stPlotlyChart"]::after {{
             content: "";
             position: absolute;
             bottom: 0; right: 0;
-            width: 48px; height: 48px;
+            width: 40px; height: 40px;
             border-right: 2px solid {ACCENT};
             border-bottom: 2px solid {ACCENT};
             border-radius: 0 0 14px 0;
-            opacity: 0.5;
+            opacity: 0.35;
             pointer-events: none;
+        }}
+        div[data-testid="stPydeckChart"] {{
+            background: {CARD};
+            border: 1px solid {CARD_BORDER};
+            border-radius: 14px;
+            overflow: hidden;
         }}
         .section-label {{
             font-family: 'Rajdhani', sans-serif;
@@ -401,14 +407,9 @@ def render_kpi_row(values: list[tuple[str, str, str]]) -> None:
             )
 
 
-def chart_panel_open(label: str, heading: str) -> None:
+def section_header(label: str, heading: str) -> None:
     st.markdown(
         f'<div class="section-label">{label}</div>'
-        f'<div class="section-heading">{heading}</div>'
-        f'<div class="chart-panel">',
+        f'<div class="section-heading">{heading}</div>',
         unsafe_allow_html=True,
     )
-
-
-def chart_panel_close() -> None:
-    st.markdown("</div>", unsafe_allow_html=True)
