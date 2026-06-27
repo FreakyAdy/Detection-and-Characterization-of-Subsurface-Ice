@@ -176,12 +176,12 @@ def build_traverse_animation(
     ))
     map_fig.add_trace(go.Scatter(
         x=cols, y=rows, mode="lines",
-        line=dict(color="rgba(255,107,53,0.4)", width=2),
+        line=dict(color="rgba(77,166,255,0.35)", width=2),
         name="Full path", showlegend=True,
     ))
     map_fig.add_trace(go.Scatter(
         x=[cols[0]], y=[rows[0]], mode="markers+text",
-        marker=dict(size=14, color="#2ecc71", symbol="triangle-up"),
+        marker=dict(size=14, color="#4da6ff", symbol="triangle-up"),
         text=["START"], textposition="top center", name="Start",
     ))
     map_fig.add_trace(go.Scatter(
@@ -191,8 +191,9 @@ def build_traverse_animation(
     ))
     map_fig.add_trace(go.Scatter(
         x=[cols[0]], y=[rows[0]], mode="markers+lines",
-        marker=dict(size=16, color="#ff6b35", symbol="circle"),
-        line=dict(color="#ff6b35", width=3),
+        marker=dict(size=16, color="#4da6ff", symbol="circle",
+                    line=dict(width=2, color="#ffffff")),
+        line=dict(color="#4da6ff", width=3),
         name="Rover",
     ))
 
