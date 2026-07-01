@@ -1,0 +1,29 @@
+flowchart LR
+    Scientist((Planetary Scientist))
+    Planner((Mission Planner))
+    Rover((Rover Operations Team))
+    Judge((Hackathon Evaluator))
+
+    subgraph System[LunarIcePath System]
+        UC1[Upload / load DFSAR and OHRC data]
+        UC2[Generate CPR, DOP and ice probability maps]
+        UC3[Validate ice candidates against terrain morphology]
+        UC4[Rank landing sites]
+        UC5[Plan rover traverse]
+        UC6[Estimate ice volume with uncertainty]
+        UC7[View dashboard and export outputs]
+    end
+
+    Scientist --> UC1
+    Scientist --> UC2
+    Scientist --> UC3
+    Planner --> UC4
+    Planner --> UC5
+    Rover --> UC5
+    Rover --> UC7
+    Judge --> UC7
+    UC2 --> UC6
+    UC3 --> UC4
+    UC4 --> UC5
+    UC5 --> UC7
+    UC6 --> UC7

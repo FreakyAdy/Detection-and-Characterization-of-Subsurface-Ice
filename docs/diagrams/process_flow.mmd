@@ -1,0 +1,27 @@
+flowchart TD
+    A[Start: Select BAH 2026 PS8 target region] --> B[Ingest Chandrayaan-2 DFSAR L/S-band radar data]
+    A --> C[Ingest Chandrayaan-2 OHRC imagery or DEM]
+    B --> D[Radiometric calibration and speckle filtering]
+    D --> E[Compute CPR and DOP layers]
+    E --> F[Apply ice-candidate rule: CPR > 1 and DOP < 0.13]
+    C --> G[Generate terrain layers: slope, roughness, boulder/texture proxy]
+    F --> H[Fuse radar evidence with terrain/morphology priors]
+    G --> H
+    H --> I[Ice probability map with confidence score]
+    G --> J[Landing-zone scoring]
+    I --> J
+    J --> K[Rank safe landing ellipses]
+    I --> L[Define science targets and ice-rich zones]
+    G --> M[Build traverse cost surface]
+    K --> N[Choose top landing site]
+    L --> O[Choose ice target point or region]
+    M --> P[Run weighted A* / Pareto traverse optimizer]
+    N --> P
+    O --> P
+    P --> Q[Validate path against slope and hazard constraints]
+    I --> R[Estimate subsurface ice volume]
+    R --> S[Monte Carlo uncertainty interval]
+    Q --> T[Interactive Streamlit mission dashboard]
+    K --> T
+    S --> T
+    T --> U[Final outputs: maps, ranked sites, rover path, volume estimate, demo report]

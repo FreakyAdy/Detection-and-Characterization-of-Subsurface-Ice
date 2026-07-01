@@ -1,0 +1,56 @@
+flowchart TB
+    subgraph Data[Input Data Layer]
+        D1[Chandrayaan-2 DFSAR L-band/S-band polarimetric radar]
+        D2[Chandrayaan-2 OHRC imagery / DEM]
+        D3[Configuration: thresholds, rover constraints, depth assumptions]
+    end
+
+    subgraph Processing[Processing Layer]
+        P1[MIDAS / GDAL preprocessing]
+        P2[Python raster pipeline: Rasterio, NumPy, SciPy]
+        P3[CPR and DOP computation]
+        P4[Terrain analysis: slope, roughness, hazard proxy]
+        P5[Ice-probability fusion]
+        P6[Landing-site ranker]
+        P7[Weighted A* / Pareto traverse optimizer]
+        P8[Monte Carlo volume estimator]
+    end
+
+    subgraph Storage[Output Storage]
+        S1[GeoTIFF layers: CPR, DOP, ice probability]
+        S2[NumPy arrays for dashboard]
+        S3[JSON summary: KPIs, path, landing sites, volume CI]
+    end
+
+    subgraph App[Presentation Layer]
+        A1[Streamlit dashboard]
+        A2[Plotly maps and charts]
+        A3[PyDeck / 3D terrain view]
+        A4[Judge presentation mode]
+    end
+
+    D1 --> P1 --> P2 --> P3
+    D2 --> P2 --> P4
+    D3 --> P3
+    D3 --> P6
+    D3 --> P7
+    D3 --> P8
+    P3 --> P5
+    P4 --> P5
+    P5 --> P6
+    P5 --> P7
+    P4 --> P6
+    P4 --> P7
+    P5 --> P8
+    P3 --> S1
+    P5 --> S1
+    P4 --> S2
+    P6 --> S3
+    P7 --> S3
+    P8 --> S3
+    S1 --> A1
+    S2 --> A1
+    S3 --> A1
+    A1 --> A2
+    A1 --> A3
+    A1 --> A4
